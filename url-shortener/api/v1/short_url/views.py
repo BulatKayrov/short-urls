@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from starlette.responses import RedirectResponse
 
-from api.v1.short_url.dependencies import SHORT_URLS, prefetch_short_urls
+from api.v1.short_url.dependencies import storage, prefetch_short_urls
 from api.v1.short_url.schemas import ShortUrl, SCreateShortUrl
 
 router = APIRouter(prefix="/shortener", tags=["Short URLs"])
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/shortener", tags=["Short URLs"])
 
 @router.get("/short-url", response_model=list[ShortUrl])
 async def short_url():
-    return SHORT_URLS
+    return storage.get()
 
 
 @router.get("/short-url/{slug}")
@@ -29,4 +29,4 @@ async def create_short_url(
     # target_url: Annotated[AnyHttpUrl, Form()],
     # slug: Annotated[str, Form(min_length=5, max_length=100)],
 ):
-    return ShortUrl(**data.model_dump())
+    return storage.create(data=data)
