@@ -1,34 +1,14 @@
-from fastapi import FastAPI, HTTPException, status, Depends
-from starlette.responses import RedirectResponse
+from fastapi import FastAPI
 
-from schemas.short_url import ShortUrl
+from api import router
 
-app = FastAPI(
-    title="URL Shortener",
-    version="1.0",
-)
-
-SHORT_URLS = [
-    ShortUrl(target_url="https://example.com", slug="example"),
-    ShortUrl(target_url="https://google.com", slug="google"),
-]
+app = FastAPI(title="Сокращатель ссылок", version="1.0")
+app.include_router(router)
 
 
-async def prefetch_short_urls(slug: str):
-    url: ShortUrl | None = next((url for url in SHORT_URLS if url.slug == slug), None)
-    if url:
-        return url
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-
-@app.get("/short-url", response_model=list[ShortUrl])
-async def short_url():
-    return SHORT_URLS
-
-
-@app.get("/short-url/{slug}")
-async def redirect_short_url(url=Depends(prefetch_short_urls)):
-    return RedirectResponse(url.target_url)
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
 
 
 if __name__ == "__main__":
