@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, status
 
 from api.tools import RESPONSES
 from api.v1.short_url.dependencies import storage, prefetch_short_urls
-from api.v1.short_url.schemas import ShortUrl, SCreateShortUrl, SUpdateShortUrl
+from api.v1.short_url.schemas import (
+    ShortUrl,
+    SCreateShortUrl,
+    SUpdateShortUrl,
+    SUpdatePathShortUrl,
+)
 
 router = APIRouter(prefix="/shortener", tags=["Short URLs"])
 
@@ -40,4 +45,13 @@ async def delete_short_url(url=Depends(prefetch_short_urls)):
 async def update_short_url(
     short_in: SUpdateShortUrl, short=Depends(prefetch_short_urls)
 ):
-    return storage.update_by_slug(short_url=short, short_url_in=short_in)
+    # return storage.update_by_slug(short_url=short, short_url_in=short_in)
+    return storage.update_short(short_url=short, short_url_in=short_in)
+
+
+@router.patch(path="/short-url/{slug}", response_model=ShortUrl)
+async def patch_short_url(
+    short_in: SUpdatePathShortUrl, short=Depends(prefetch_short_urls)
+):
+    # return storage.partial_update(short_url=short, short_url_in=short_in)
+    return storage.update_short(short_url=short, short_url_in=short_in, partial=True)

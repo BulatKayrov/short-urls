@@ -1,7 +1,12 @@
 from fastapi import HTTPException
 from pydantic import BaseModel
 
-from api.v1.short_url.schemas import ShortUrl, SCreateShortUrl, SUpdateShortUrl
+from api.v1.short_url.schemas import (
+    ShortUrl,
+    SCreateShortUrl,
+    SUpdateShortUrl,
+    SUpdatePathShortUrl,
+)
 
 SHORT_URLS = [
     ShortUrl(target_url="https://example.com", slug="example"),
@@ -38,6 +43,25 @@ class ShortUrlsStorage(BaseModel):
         for name, value in short_url_in:
             setattr(short_url, name, value)
 
+        return short_url
+
+    def partial_update(self, short_url: ShortUrl, short_url_in: SUpdatePathShortUrl):
+        for name, value in short_url_in.model_dump(
+            exclude_none=True, exclude_unset=True
+        ).items():
+            setattr(short_url, name, value)
+        return short_url
+
+    def update_short(
+        self,
+        short_url: ShortUrl,
+        short_url_in: SUpdatePathShortUrl,
+        partial: bool = False,
+    ):
+        for name, value in short_url_in.model_dump(
+            exclude_none=partial, exclude_unset=partial
+        ).items():
+            setattr(short_url, name, value)
         return short_url
 
 
