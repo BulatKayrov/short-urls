@@ -31,3 +31,7 @@ class SUpdateShortUrl(ShortUrlBase):
 class SUpdatePathShortUrl(ShortUrlBase):
     target_url: AnyHttpUrl | None = None
     description: str | None = None
+
+
+class ShortUrlFroAdmin(ShortUrl):
+    visits: int = 40
