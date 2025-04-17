@@ -16,6 +16,17 @@ logger = getLogger(__name__)
 class ShortUrlsStorage(BaseModel):
     slug_to_short_url: dict[str, ShortUrl] = {}
 
+    def init_storage(self) -> None:
+        try:
+            data = ShortUrlsStorage.from_statement()
+        except ValidationError as e:
+            self.save()
+            logger.warning("ShortUrlsStorage reloaded")
+            return
+
+        self.slug_to_short_url.update(data.slug_to_short_url)
+        logger.warning("ShortUrlsStorage loaded")
+
     def save(self):
         settings.DB_FILE.write_text(self.model_dump_json(indent=4))
         logger.debug("Saved short url schema")
@@ -74,10 +85,5 @@ class ShortUrlsStorage(BaseModel):
         return short_url
 
 
-try:
-    storage = ShortUrlsStorage.from_statement()
-    logger.warning("ShortUrlsStorage loaded")
-except ValidationError as e:
-    storage = ShortUrlsStorage()
-    storage.save()
-    logger.warning("ShortUrlsStorage reloaded")
+storage = ShortUrlsStorage()
+storage.init_storage()
