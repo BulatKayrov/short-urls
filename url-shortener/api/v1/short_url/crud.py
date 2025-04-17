@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from pydantic import BaseModel, ValidationError
 
 from api.v1.short_url.schemas import (
@@ -8,12 +10,15 @@ from api.v1.short_url.schemas import (
 )
 from core.config import settings
 
+logger = getLogger(__name__)
+
 
 class ShortUrlsStorage(BaseModel):
     slug_to_short_url: dict[str, ShortUrl] = {}
 
     def save(self):
         settings.DB_FILE.write_text(self.model_dump_json(indent=4))
+        logger.debug("Saved short url schema")
 
     @classmethod
     def from_statement(cls):
@@ -31,6 +36,7 @@ class ShortUrlsStorage(BaseModel):
         short_url = ShortUrl(**data.model_dump())
         self.slug_to_short_url[short_url.slug] = short_url
         self.save()
+        logger.info("Created short url %s", short_url.slug)
         return short_url
 
     def delete_by_slug(self, slug):
@@ -70,6 +76,8 @@ class ShortUrlsStorage(BaseModel):
 
 try:
     storage = ShortUrlsStorage.from_statement()
+    logger.warning("ShortUrlsStorage loaded")
 except ValidationError as e:
     storage = ShortUrlsStorage()
     storage.save()
+    logger.warning("ShortUrlsStorage reloaded")

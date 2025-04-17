@@ -1,9 +1,14 @@
+import logging
+
 from fastapi import FastAPI
 
 from api import router
+from core.config import settings
 
 app = FastAPI(title="Сокращатель ссылок", version="1.0")
 app.include_router(router)
+
+logging.basicConfig(level=settings.LOG_LEVEL, format=settings.LOG_FORMAT)
 
 
 @app.get("/")
