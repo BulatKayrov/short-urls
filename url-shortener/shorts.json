@@ -1,0 +1,9 @@
+{
+    "slug_to_short_url": {
+        "example": {
+            "target_url": "https://example.com/",
+            "description": "default",
+            "slug": "example"
+        }
+    }
+}
