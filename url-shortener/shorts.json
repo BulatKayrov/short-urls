@@ -24,6 +24,11 @@
             "target_url": "https://apple.com/",
             "description": "apple",
             "slug": "apples"
+        },
+        "exsdsdsdample": {
+            "target_url": "https://example.com/",
+            "description": "default",
+            "slug": "exsdsdsdample"
         }
     }
 }
