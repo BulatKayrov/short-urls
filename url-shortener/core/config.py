@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     LOG_LEVEL: int = logging.INFO
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+    # jwt
+    API_TOKENS: frozenset[str] = frozenset(
+        {"aK1J-Ez_gQc4iHh8Pa6J-w", "vHOm99YdSFO7c3PuIA6guQ"}
+    )
 
 
 settings = Settings()

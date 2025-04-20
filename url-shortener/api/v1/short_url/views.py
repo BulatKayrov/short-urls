@@ -1,12 +1,11 @@
-from logging import getLogger
-
-from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi import APIRouter, Depends, status
 
 from api.tools import RESPONSES
 from api.v1.short_url.dependencies import (
     storage,
     prefetch_short_urls,
     save_storage_state,
+    api_token_require,
 )
 from api.v1.short_url.schemas import (
     ShortUrl,
@@ -28,7 +27,6 @@ def short_url():
 @router.get("/short-url/{slug}")
 def redirect_short_url(url=Depends(prefetch_short_urls)):
     return url
-    # return RedirectResponse(url.target_url)
 
 
 @router.post(
@@ -38,7 +36,7 @@ def redirect_short_url(url=Depends(prefetch_short_urls)):
     summary="Create new short url",
     description="Create a new short url",
 )
-def create_short_url(data: SCreateShortUrl):
+def create_short_url(data: SCreateShortUrl, _=Depends(api_token_require)):
     return storage.create(data)
 
 

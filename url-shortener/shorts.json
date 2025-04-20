@@ -10,25 +10,10 @@
             "description": "defa1ult",
             "slug": "exa1mple"
         },
-        "exa1m2ple": {
-            "target_url": "https://ex1am2ple.com/",
-            "description": "defa12ult",
-            "slug": "exa1m2ple"
-        },
-        "exa1m2psdle": {
-            "target_url": "https://ex1sdam2ple.com/",
-            "description": "defa12usdlt",
-            "slug": "exa1m2psdle"
-        },
-        "apples": {
-            "target_url": "https://apple.com/",
-            "description": "apple",
-            "slug": "apples"
-        },
-        "exsdsdsdample": {
+        "exsdample": {
             "target_url": "https://example.com/",
             "description": "default",
-            "slug": "exsdsdsdample"
+            "slug": "exsdample"
         }
     }
 }

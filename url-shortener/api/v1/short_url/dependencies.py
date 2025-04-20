@@ -1,9 +1,10 @@
 from logging import getLogger
 
-from fastapi import HTTPException, status, BackgroundTasks, Request
+from fastapi import HTTPException, status, BackgroundTasks, Request, Query
 
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
+from core.config import settings
 
 logger = getLogger(__name__)
 
@@ -23,3 +24,11 @@ def save_storage_state(bg_task: BackgroundTasks, request: Request):
     if request.method not in UNSAFE_METHODS:
         logger.info("Saving storage state")
         bg_task.add_task(storage.save())
+
+
+def api_token_require(api_token: str = Query()):
+    if api_token not in settings.API_TOKENS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API token"
+        )
+    return api_token
