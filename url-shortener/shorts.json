@@ -6,7 +6,7 @@
             "slug": "exa1mple"
         },
         "example": {
-            "target_url": "https://yandex.com/",
+            "target_url": "https://example.com/",
             "description": "default",
             "slug": "example"
         }

@@ -2,7 +2,12 @@ from logging import getLogger
 
 from fastapi import HTTPException, status, BackgroundTasks, Request
 from fastapi.params import Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import (
+    HTTPBearer,
+    HTTPAuthorizationCredentials,
+    HTTPBasic,
+    HTTPBasicCredentials,
+)
 
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
@@ -13,8 +18,32 @@ logger = getLogger(__name__)
 UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
 static_api_token = HTTPBearer(
-    auto_error=False, scheme_name="Static API token", description="Static API token"
+    auto_error=False,
+    scheme_name="Static API token",
+    description="Static API token",
 )
+
+_user_basic_http_auth = HTTPBasic(
+    scheme_name="Basic",
+    description="Basic auth scheme, username + password",
+    auto_error=False,
+)
+
+
+def user_basic_auth_required(
+    credentials: HTTPBasicCredentials | None = Depends(_user_basic_http_auth),
+):
+    if (
+        credentials
+        and credentials.username in settings.USER_DB
+        and settings.USER_DB[credentials.username] == credentials.password
+    ):
+        return
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid credentials [username or password]",
+        headers={"WWW-Authenticate": "Basic"},
+    )
 
 
 def prefetch_short_urls(slug: str):

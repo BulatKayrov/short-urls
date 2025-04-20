@@ -5,7 +5,7 @@ from api.v1.short_url.dependencies import (
     storage,
     prefetch_short_urls,
     save_storage_state,
-    api_token_require,
+    user_basic_auth_required,
 )
 from api.v1.short_url.schemas import (
     ShortUrl,
@@ -17,7 +17,10 @@ from api.v1.short_url.schemas import (
 router = APIRouter(
     prefix="/shortener",
     tags=["Short URLs"],
-    dependencies=[Depends(save_storage_state), Depends(api_token_require)],
+    dependencies=[
+        Depends(save_storage_state),
+        # Depends(api_token_require),
+    ],
 )
 
 
@@ -37,6 +40,7 @@ def redirect_short_url(url=Depends(prefetch_short_urls)):
     status_code=status.HTTP_201_CREATED,
     summary="Create new short url",
     description="Create a new short url",
+    dependencies=[Depends(user_basic_auth_required)],
 )
 def create_short_url(data: SCreateShortUrl):
     return storage.create(data)
