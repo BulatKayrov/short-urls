@@ -5,10 +5,10 @@
             "description": "defa1ult",
             "slug": "exa1mple"
         },
-        "exsdample": {
-            "target_url": "https://example.com/",
+        "example": {
+            "target_url": "https://yandex.com/",
             "description": "default",
-            "slug": "exsdample"
+            "slug": "example"
         }
     }
 }
