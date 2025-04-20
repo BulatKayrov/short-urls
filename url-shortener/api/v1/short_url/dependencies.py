@@ -7,7 +7,7 @@ from api.v1.short_url.schemas import ShortUrl
 
 logger = getLogger(__name__)
 
-UNSAFE_METHODS = frozenset({'POST', 'PUT', 'PATCH', 'DELETE'})
+UNSAFE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
 
 
 def prefetch_short_urls(slug: str):
