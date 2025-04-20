@@ -1,6 +1,6 @@
 from logging import getLogger
 
-from fastapi import HTTPException, status, BackgroundTasks, Request, Query
+from fastapi import HTTPException, status, BackgroundTasks, Request, Header
 
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
@@ -26,7 +26,13 @@ def save_storage_state(bg_task: BackgroundTasks, request: Request):
         bg_task.add_task(storage.save())
 
 
-def api_token_require(api_token: str = Query()):
+def api_token_require(
+    request: Request, api_token: str = Header(default="", alias="x-auth-token")
+):
+
+    if request.method not in UNSAFE_METHODS:
+        return
+
     if api_token not in settings.API_TOKENS:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API token"
