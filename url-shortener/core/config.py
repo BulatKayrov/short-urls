@@ -18,8 +18,7 @@ class Settings(BaseSettings):
     )
 
     USER_DB: dict[str, str] = {
-        "sam": "password",
-        "bob": "123",
+        "1": "1",
     }
 
 
