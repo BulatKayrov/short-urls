@@ -21,5 +21,9 @@ class Settings(BaseSettings):
         "1": "1",
     }
 
+    # redis
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6666
+
 
 settings = Settings()
