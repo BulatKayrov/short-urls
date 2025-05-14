@@ -1,17 +1,22 @@
 from logging import getLogger
+from typing import TYPE_CHECKING
 
-from fastapi import HTTPException, status, BackgroundTasks, Request
+from fastapi import BackgroundTasks, HTTPException, Request, status
 from fastapi.params import Depends
 from fastapi.security import (
-    HTTPBearer,
     HTTPAuthorizationCredentials,
     HTTPBasic,
     HTTPBasicCredentials,
+    HTTPBearer,
 )
 
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
 from core.config import settings
+from .redis_dependency import redis
+
+if TYPE_CHECKING:
+    pass
 
 logger = getLogger(__name__)
 
@@ -42,7 +47,7 @@ def user_basic_auth_required(
             detail="Invalid credentials [username or password]",
             headers={"WWW-Authenticate": "Basic"},
         )
-    return validate_basic_auth(credentials=credentials)
+    validate_basic_auth(credentials=credentials)
 
 
 def prefetch_short_urls(slug: str):
@@ -76,11 +81,13 @@ def api_token_require(
 
 
 def validate_api_token(api_token: HTTPAuthorizationCredentials):
-    if api_token.credentials not in settings.API_TOKENS:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API token"
-        )
-    return api_token
+    if redis.sismember(settings.REDIS_TOKENS_SET_NAME, api_token.credentials):
+        return api_token
+    print(api_token.credentials)
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid API token (HTTPAuthorizationCredentials)",
+    )
 
 
 def validate_basic_auth(credentials: HTTPBasicCredentials):
@@ -91,7 +98,7 @@ def validate_basic_auth(credentials: HTTPBasicCredentials):
         return
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid credentials [username or password]",
+        detail="Invalid credentials [username or password] (HTTPBasicCredentials)",
         headers={"WWW-Authenticate": "Basic"},
     )
 
