@@ -12,16 +12,13 @@ class Settings(BaseSettings):
     LOG_LEVEL: int = logging.INFO
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-    USER_DB: dict[str, str] = {
-        "1": "1",
-    }
-
     # redis
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6666
     REDIS_DB: int = 0
     REDIS_DB_TOKENS: int = 1
     REDIS_TOKENS_SET_NAME: str = "tokens"
+    REDIS_USER_DB: int = 2
 
 
 settings = Settings()

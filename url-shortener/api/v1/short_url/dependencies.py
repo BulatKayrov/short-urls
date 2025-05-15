@@ -10,10 +10,9 @@ from fastapi.security import (
     HTTPBearer,
 )
 
+from api.v1.short_url.auth.service import redis_auth_helper, redis_tokens_helper
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
-from core.config import settings
-from .redis_dependency import redis_tokens_helper
 
 if TYPE_CHECKING:
     pass
@@ -91,9 +90,9 @@ def validate_api_token(api_token: HTTPAuthorizationCredentials):
 
 
 def validate_basic_auth(credentials: HTTPBasicCredentials):
-    if (
-        credentials.username in settings.USER_DB
-        and settings.USER_DB[credentials.username] == credentials.password
+
+    if redis_auth_helper.validate_user_password(
+        username=credentials.username, password=credentials.password
     ):
         return
     raise HTTPException(

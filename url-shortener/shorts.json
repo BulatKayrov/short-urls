@@ -1,10 +1,5 @@
 {
     "slug_to_short_url": {
-        "exa1mple": {
-            "target_url": "https://ex1ample.com/",
-            "description": "defa1ult",
-            "slug": "exa1mple"
-        },
         "example": {
             "target_url": "https://example.com/",
             "description": "default",
