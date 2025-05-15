@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import FastAPI
+from starlette.responses import RedirectResponse
 
 from api import router
 from app_lifespan import lifespan
@@ -14,7 +15,7 @@ logging.basicConfig(level=settings.LOG_LEVEL, format=settings.LOG_FORMAT)
 
 @app.get("/")
 def root():
-    return {"message": "Hello World"}
+    return RedirectResponse(url="http://0.0.0.0:8000/docs")
 
 
 if __name__ == "__main__":

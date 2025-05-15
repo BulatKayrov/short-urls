@@ -9,11 +9,6 @@
             "target_url": "https://example.com/",
             "description": "default",
             "slug": "example"
-        },
-        "sdsdsd": {
-            "target_url": "https://sdsd.com/",
-            "description": "sdsd",
-            "slug": "sdsdsd"
         }
     }
 }

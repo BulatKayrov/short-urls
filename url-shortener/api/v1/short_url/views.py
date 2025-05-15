@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, status
 
-from api.tools import RESPONSES
 from api.v1.short_url.dependencies import (
-    storage,
+    api_or_basic,
     prefetch_short_urls,
     save_storage_state,
-    api_or_basic,
+    storage,
 )
 from api.v1.short_url.schemas import (
-    ShortUrl,
     SCreateShortUrl,
-    SUpdateShortUrl,
     SUpdatePathShortUrl,
+    SUpdateShortUrl,
+    ShortUrl,
 )
+from tools import RESPONSES
 
 router = APIRouter(
     prefix="/shortener",

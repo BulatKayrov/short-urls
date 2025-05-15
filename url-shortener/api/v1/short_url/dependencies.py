@@ -13,7 +13,7 @@ from fastapi.security import (
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
 from core.config import settings
-from .redis_dependency import redis
+from .redis_dependency import redis_tokens_helper
 
 if TYPE_CHECKING:
     pass
@@ -81,7 +81,7 @@ def api_token_require(
 
 
 def validate_api_token(api_token: HTTPAuthorizationCredentials):
-    if redis.sismember(settings.REDIS_TOKENS_SET_NAME, api_token.credentials):
+    if redis_tokens_helper.token_exists(api_token.credentials):
         return api_token
     print(api_token.credentials)
     raise HTTPException(
