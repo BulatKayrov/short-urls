@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from fastapi import HTTPException
 from pydantic import BaseModel, ValidationError
 from redis import Redis
 
@@ -46,10 +47,15 @@ class ShortUrlsStorage(BaseModel):
         return cls.model_validate_json(settings.DB_FILE.read_text())
 
     def get(self):
-        return list(self.slug_to_short_url.values())
+        # result = redis_helper.hgetall(name=settings.REDIS_SHORT_URL_HASH_NAME)
+        result = redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
+        return [ShortUrl.model_validate_json(item) for item in result] if result else []
 
     def get_by_slug(self, slug):
-        return self.slug_to_short_url.get(slug)
+        obj = redis_helper.hget(name=settings.REDIS_SHORT_URL_HASH_NAME, key=slug)
+        if obj:
+            return ShortUrl.model_validate_json(json_data=obj)
+        return HTTPException(status_code=404, detail="Not found")
 
     def create(self, data: SCreateShortUrl):
         short_url = ShortUrl(**data.model_dump())
@@ -62,6 +68,7 @@ class ShortUrlsStorage(BaseModel):
         return short_url
 
     def delete_by_slug(self, slug):
+        redis_helper.hdel(settings.REDIS_SHORT_URL_HASH_NAME, slug)
         self.slug_to_short_url.pop(slug, None)
 
     def delete_short_url(self, short_url: ShortUrl):
