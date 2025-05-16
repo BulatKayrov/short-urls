@@ -5,7 +5,7 @@ from redis import Redis
 from core.config import settings
 
 
-class AbstractTokenHelper(ABC):
+class AbstractUserHelper(ABC):
 
     @abstractmethod
     def get_user_password(self, username: str):
@@ -26,7 +26,7 @@ class AbstractTokenHelper(ABC):
         return self.verify_password(password1=password_db, password2=password)
 
 
-class RedisTokenHelper(AbstractTokenHelper):
+class RedisTokenHelper(AbstractUserHelper):
     def __init__(
         self,
         host: str,
