@@ -1,13 +1,11 @@
 from logging import getLogger
 
 from fastapi import HTTPException
-from pydantic import BaseModel, ValidationError
 from redis import Redis
 
 from api.v1.short_url.schemas import (
     SCreateShortUrl,
     SUpdatePathShortUrl,
-    SUpdateShortUrl,
     ShortUrl,
 )
 from core.config import settings
@@ -22,42 +20,22 @@ redis_helper = Redis(
 )
 
 
-class ShortUrlsStorage(BaseModel):
-    slug_to_short_url: dict[str, ShortUrl] = {}
-
-    def init_storage(self) -> None:
-        try:
-            data = ShortUrlsStorage.from_statement()
-        except ValidationError:
-            self.save()
-            logger.warning("ShortUrlsStorage reloaded")
-            return
-
-        self.slug_to_short_url.update(data.slug_to_short_url)
-        logger.warning("ShortUrlsStorage loaded")
-
-    def save(self):
-        settings.DB_FILE.write_text(self.model_dump_json(indent=4))
-        logger.debug("Saved short url schema")
+class ShortUrlsStorage:
 
     @classmethod
-    def from_statement(cls):
-        if not settings.DB_FILE.exists():
-            return ShortUrlsStorage()
-        return cls.model_validate_json(settings.DB_FILE.read_text())
-
-    def get(self):
-        # result = redis_helper.hgetall(name=settings.REDIS_SHORT_URL_HASH_NAME)
+    def get(cls):
         result = redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
         return [ShortUrl.model_validate_json(item) for item in result] if result else []
 
-    def get_by_slug(self, slug):
+    @classmethod
+    def get_by_slug(cls, slug):
         obj = redis_helper.hget(name=settings.REDIS_SHORT_URL_HASH_NAME, key=slug)
         if obj:
             return ShortUrl.model_validate_json(json_data=obj)
         return HTTPException(status_code=404, detail="Not found")
 
-    def create(self, data: SCreateShortUrl):
+    @classmethod
+    def create(cls, data: SCreateShortUrl | ShortUrl):
         short_url = ShortUrl(**data.model_dump())
         redis_helper.hset(
             name=settings.REDIS_SHORT_URL_HASH_NAME,
@@ -67,40 +45,28 @@ class ShortUrlsStorage(BaseModel):
         logger.info("Created short url %s", short_url.slug)
         return short_url
 
-    def delete_by_slug(self, slug):
+    @classmethod
+    def delete_by_slug(cls, slug):
         redis_helper.hdel(settings.REDIS_SHORT_URL_HASH_NAME, slug)
-        self.slug_to_short_url.pop(slug, None)
 
-    def delete_short_url(self, short_url: ShortUrl):
-        self.delete_by_slug(slug=short_url.slug)
+    @classmethod
+    def delete_short_url(cls, short_url: ShortUrl):
+        cls.delete_by_slug(slug=short_url.slug)
 
-    def update_by_slug(self, short_url: ShortUrl, short_url_in: SUpdateShortUrl):
-        for name, value in short_url_in:
-            setattr(short_url, name, value)
-
-        return short_url
-
-    def partial_update(self, short_url: ShortUrl, short_url_in: SUpdatePathShortUrl):
-        for name, value in short_url_in.model_dump(
-            exclude_none=True, exclude_unset=True
-        ).items():
-            setattr(short_url, name, value)
-
-        return short_url
-
+    @classmethod
     def update_short(
-        self,
+        cls,
         short_url: ShortUrl,
         short_url_in: SUpdatePathShortUrl,
         partial: bool = False,
     ):
+        obj = cls.get_by_slug(slug=short_url.slug)
         for name, value in short_url_in.model_dump(
             exclude_none=partial, exclude_unset=partial
         ).items():
-            setattr(short_url, name, value)
+            setattr(obj, name, value)
 
-        return short_url
+        return cls.create(obj)
 
 
 storage = ShortUrlsStorage()
-storage.init_storage()
