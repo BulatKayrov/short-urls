@@ -23,6 +23,14 @@ redis_helper = Redis(
 class ShortUrlsStorage:
 
     @classmethod
+    def save(cls, short_url):
+        redis_helper.hset(
+            name=settings.REDIS_SHORT_URL_HASH_NAME,
+            key=short_url.slug,
+            value=short_url.model_dump_json(),
+        )
+
+    @classmethod
     def get(cls):
         result = redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
         return [ShortUrl.model_validate_json(item) for item in result] if result else []
@@ -37,13 +45,11 @@ class ShortUrlsStorage:
     @classmethod
     def create(cls, data: SCreateShortUrl | ShortUrl):
         short_url = ShortUrl(**data.model_dump())
-        redis_helper.hset(
-            name=settings.REDIS_SHORT_URL_HASH_NAME,
-            key=short_url.slug,
-            value=short_url.model_dump_json(),
-        )
-        logger.info("Created short url %s", short_url.slug)
-        return short_url
+        if not cls.get_by_slug(short_url.slug):
+            cls.save(short_url)
+            logger.info("Created short url %s", short_url.slug)
+            return short_url
+        raise HTTPException(status_code=404, detail="Short url already exists")
 
     @classmethod
     def delete_by_slug(cls, slug):
@@ -60,13 +66,13 @@ class ShortUrlsStorage:
         short_url_in: SUpdatePathShortUrl,
         partial: bool = False,
     ):
-        obj = cls.get_by_slug(slug=short_url.slug)
+        # obj = cls.get_by_slug(slug=short_url.slug)
         for name, value in short_url_in.model_dump(
             exclude_none=partial, exclude_unset=partial
         ).items():
-            setattr(obj, name, value)
-
-        return cls.create(obj)
+            setattr(short_url, name, value)
+        cls.save(short_url)
+        return short_url
 
 
 storage = ShortUrlsStorage()

@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from fastapi import BackgroundTasks, HTTPException, Request, status
+from fastapi import HTTPException, Request, status
 from fastapi.params import Depends
 from fastapi.security import (
     HTTPAuthorizationCredentials,
@@ -54,14 +54,6 @@ def prefetch_short_urls(slug: str):
     if url:
         return url
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-
-def save_storage_state(bg_task: BackgroundTasks, request: Request):
-    logger.info(request.method)
-    yield
-    if request.method not in UNSAFE_METHODS:
-        logger.info("Saving storage state")
-        bg_task.add_task(storage.save)
 
 
 def api_token_require(
