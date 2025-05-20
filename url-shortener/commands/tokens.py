@@ -20,3 +20,8 @@ def check(
         print("Token [green]exists[/green]")
     else:
         print("Token [red]doesn't exist[/red]")
+
+
+@app.command(help="Get tokens")
+def list():
+    print(redis_tokens_helper.get_tokens())

@@ -26,7 +26,7 @@ class AbstractUserHelper(ABC):
         return self.verify_password(password1=password_db, password2=password)
 
 
-class RedisTokenHelper(AbstractUserHelper):
+class RedisUserHelper(AbstractUserHelper):
     def __init__(
         self,
         host: str,
@@ -44,7 +44,7 @@ class RedisTokenHelper(AbstractUserHelper):
         return self.redis.get(username)
 
 
-redis_auth_helper = RedisTokenHelper(
+redis_auth_helper = RedisUserHelper(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     redis_db=settings.REDIS_USER_DB,
