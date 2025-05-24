@@ -25,3 +25,20 @@ def check(
 @app.command(help="Get tokens")
 def list():
     print(redis_tokens_helper.get_tokens())
+
+
+@app.command(help="Генерация и сохранение TOKEN в базу данных")
+def create():
+    print(redis_tokens_helper.generate_token_and_save())
+
+
+@app.command(help="Добавление своего токена в БД")
+def add_token(token: str = typer.Argument(help="Ваш токен")):
+    redis_tokens_helper.add_token(token=token)
+    print(f"{token} добавлен")
+
+
+@app.command(help="Удаление токена из БД")
+def rm(token: str):
+    redis_tokens_helper.delete_token(token)
+    print(f"{token} deleted")
