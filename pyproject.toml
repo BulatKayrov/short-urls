@@ -8,3 +8,8 @@ dependencies = [
     "fastapi[standard]>=0.115.12",
     "redis[hiredis]>=6.1.0",
 ]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+]
