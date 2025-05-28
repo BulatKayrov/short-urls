@@ -1,8 +1,7 @@
 from logging import getLogger
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated
 
-from fastapi import HTTPException, Request, status
-from fastapi.params import Depends
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBasic,
@@ -13,9 +12,6 @@ from fastapi.security import (
 from api.v1.short_url.auth.service import redis_auth_helper, redis_tokens_helper
 from api.v1.short_url.crud import storage
 from api.v1.short_url.schemas import ShortUrl
-
-if TYPE_CHECKING:
-    pass
 
 logger = getLogger(__name__)
 
