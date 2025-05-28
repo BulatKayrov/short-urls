@@ -29,11 +29,6 @@ def short_url():
     return storage.get()
 
 
-@router.get("/short-url/{slug}")
-def redirect_short_url(url=Depends(prefetch_short_urls)):
-    return url
-
-
 @router.post(
     path="/short-url",
     response_model=ShortUrl,
