@@ -1,4 +1,4 @@
-from pydantic import BaseModel, AnyHttpUrl, Field
+from pydantic import AnyHttpUrl, BaseModel, Field
 
 
 class ShortUrlBase(BaseModel):
@@ -28,7 +28,7 @@ class SUpdateShortUrl(ShortUrlBase):
     description: str | None = "default"
 
 
-class SUpdatePathShortUrl(ShortUrlBase):
+class SUpdatePathShortUrl(BaseModel):
     target_url: AnyHttpUrl | None = None
     description: str | None = None
 

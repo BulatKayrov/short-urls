@@ -15,14 +15,14 @@ app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 @app.command(
     help="Функция принимает аргумент [bold][green][italic]'name'[/italic][/green][/bold] на вход, но он не обязателен так как значение по дефолту установлено"
 )
-def func(name: str = typer.Argument(default="Python")):
+def func(name: str = typer.Argument(default="Python")) -> None:
     print(
         f"Этот текст из func функции. Аргумент переданный: [bold][red][italic]{name}[/italic][/red][/bold]"
     )
 
 
 @app.callback()
-def callback():
+def callback() -> None:
     """
     Тут описание работы этой утилиты CLI
     """

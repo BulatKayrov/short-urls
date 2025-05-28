@@ -52,7 +52,7 @@ class ShortUrlsStorage:
         raise HTTPException(status_code=404, detail="Short url already exists")
 
     @classmethod
-    def delete_by_slug(cls, slug):
+    def delete_by_slug(cls, slug) -> None:
         redis_helper.hdel(settings.REDIS_SHORT_URL_HASH_NAME, slug)
 
     @classmethod

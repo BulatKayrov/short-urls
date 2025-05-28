@@ -8,7 +8,6 @@ from api.v1.short_url.dependencies import (
 from api.v1.short_url.schemas import (
     SCreateShortUrl,
     SUpdatePathShortUrl,
-    SUpdateShortUrl,
     ShortUrl,
 )
 from tools import RESPONSES
@@ -50,12 +49,12 @@ def create_short_url(data: SCreateShortUrl):
 @router.delete(
     "/short-url/{slug}", status_code=status.HTTP_204_NO_CONTENT, responses={**RESPONSES}
 )
-def delete_short_url(url=Depends(prefetch_short_urls)):
+def delete_short_url(url=Depends(prefetch_short_urls)) -> None:
     return storage.delete_by_slug(slug=url.slug)
 
 
-@router.put(path="/short-url/{slug}")
-def update_short_url(short_in: SUpdateShortUrl, short=Depends(prefetch_short_urls)):
+@router.put(path="/short-url/{slug}", response_model=ShortUrl)
+def update_short_url(short_in: SUpdatePathShortUrl, short=Depends(prefetch_short_urls)):
     return storage.update_short(short_url=short, short_url_in=short_in)
 
 

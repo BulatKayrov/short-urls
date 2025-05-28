@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import TYPE_CHECKING
+from typing import Annotated, TYPE_CHECKING
 
 from fastapi import HTTPException, Request, status
 from fastapi.params import Depends
@@ -36,7 +36,7 @@ _user_basic_http_auth = HTTPBasic(
 
 def user_basic_auth_required(
     request: Request,
-    credentials: HTTPBasicCredentials | None = Depends(_user_basic_http_auth),
+    credentials: HTTPBasicCredentials = Depends(_user_basic_http_auth),
 ):
     if request.method not in UNSAFE_METHODS:
         return
@@ -58,7 +58,7 @@ def prefetch_short_urls(slug: str):
 
 def api_token_require(
     request: Request,
-    api_token: HTTPAuthorizationCredentials | None = Depends(static_api_token),
+    api_token: Annotated[HTTPAuthorizationCredentials, Depends(static_api_token)],
 ):
     if request.method not in UNSAFE_METHODS:
         return
@@ -96,8 +96,8 @@ def validate_basic_auth(credentials: HTTPBasicCredentials):
 
 def api_or_basic(
     request: Request,
-    api_token: HTTPAuthorizationCredentials | None = Depends(static_api_token),
-    credentials: HTTPBasicCredentials | None = Depends(_user_basic_http_auth),
+    api_token: Annotated[HTTPAuthorizationCredentials, Depends(static_api_token)],
+    credentials: Annotated[HTTPBasicCredentials, Depends(_user_basic_http_auth)],
 ):
     if request.method not in UNSAFE_METHODS:
         return

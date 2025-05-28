@@ -40,7 +40,7 @@ class RedisUserHelper(AbstractUserHelper):
             db=redis_db,
         )
 
-    def get_user_password(self, username):
+    def get_user_password(self, username) -> str | None:
         return self.redis.get(username)
 
 
