@@ -7,9 +7,69 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "redis[hiredis]>=6.1.0",
+    "ruff>=0.11.12",
 ]
 
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
 ]
+
+# mypy
+[tool.mypy]
+strict = true
+
+# ruff
+[tool.ruff]
+
+# игнорирование
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    '.venv'
+]
+
+# откуда проверять
+src = ['url-shortener']
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# с каким питоном работаем
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["FAST"]
+ignore = []
+
+# то что ruff может сам починить
+fixable = ["ALL"]
+unfixable = []
+
+
+

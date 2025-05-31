@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, status
 
 from api.v1.short_url.dependencies import (
@@ -25,7 +27,7 @@ router = APIRouter(
 
 
 @router.get("/short-url", response_model=list[ShortUrl])
-def short_url():
+def short_url() -> list[ShortUrl] | []:
     return storage.get()
 
 
@@ -37,22 +39,26 @@ def short_url():
     description="Create a new short url",
     # dependencies=[Depends(user_basic_auth_required)],
 )
-def create_short_url(data: SCreateShortUrl):
+def create_short_url(data: SCreateShortUrl) -> ShortUrl:
     return storage.create(data)
 
 
 @router.delete(
     "/short-url/{slug}", status_code=status.HTTP_204_NO_CONTENT, responses={**RESPONSES}
 )
-def delete_short_url(url=Depends(prefetch_short_urls)) -> None:
-    return storage.delete_by_slug(slug=url.slug)
+def delete_short_url(url: Any = Depends(prefetch_short_urls)) -> None:
+    storage.delete_by_slug(slug=url.slug)
 
 
 @router.put(path="/short-url/{slug}", response_model=ShortUrl)
-def update_short_url(short_in: SUpdatePathShortUrl, short=Depends(prefetch_short_urls)):
+def update_short_url(
+    short_in: SUpdatePathShortUrl, short: Any = Depends(prefetch_short_urls)
+) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in)
 
 
 @router.patch(path="/short-url/{slug}", response_model=ShortUrl)
-def patch_short_url(short_in: SUpdatePathShortUrl, short=Depends(prefetch_short_urls)):
+def patch_short_url(
+    short_in: SUpdatePathShortUrl, short: Any = Depends(prefetch_short_urls)
+) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in, partial=True)

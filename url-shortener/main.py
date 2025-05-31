@@ -14,7 +14,7 @@ logging.basicConfig(level=settings.LOG_LEVEL, format=settings.LOG_FORMAT)
 
 
 @app.get("/")
-def root():
+def root() -> RedirectResponse:
     return RedirectResponse(url="http://0.0.0.0:8000/docs")
 
 

@@ -33,7 +33,7 @@ _user_basic_http_auth = HTTPBasic(
 def user_basic_auth_required(
     request: Request,
     credentials: HTTPBasicCredentials = Depends(_user_basic_http_auth),
-):
+) -> None:
     if request.method not in UNSAFE_METHODS:
         return
     if not credentials:
@@ -45,7 +45,7 @@ def user_basic_auth_required(
     validate_basic_auth(credentials=credentials)
 
 
-def prefetch_short_urls(slug: str):
+def prefetch_short_urls(slug: str) -> ShortUrl:
     url: ShortUrl | None = storage.get_by_slug(slug=slug)
     if url:
         return url
@@ -55,9 +55,9 @@ def prefetch_short_urls(slug: str):
 def api_token_require(
     request: Request,
     api_token: Annotated[HTTPAuthorizationCredentials, Depends(static_api_token)],
-):
+) -> HTTPAuthorizationCredentials | None:
     if request.method not in UNSAFE_METHODS:
-        return
+        return None
     logger.info("api token required %s", api_token)
     if not api_token:
         raise HTTPException(
@@ -67,22 +67,23 @@ def api_token_require(
     return validate_api_token(api_token=api_token)
 
 
-def validate_api_token(api_token: HTTPAuthorizationCredentials):
+def validate_api_token(
+    api_token: HTTPAuthorizationCredentials,
+) -> HTTPAuthorizationCredentials:
     if redis_tokens_helper.token_exists(api_token.credentials):
         return api_token
-    print(api_token.credentials)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid API token (HTTPAuthorizationCredentials)",
     )
 
 
-def validate_basic_auth(credentials: HTTPBasicCredentials):
+def validate_basic_auth(credentials: HTTPBasicCredentials) -> None:
 
     if redis_auth_helper.validate_user_password(
         username=credentials.username, password=credentials.password
     ):
-        return
+        return None
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid credentials [username or password] (HTTPBasicCredentials)",
@@ -94,14 +95,14 @@ def api_or_basic(
     request: Request,
     api_token: Annotated[HTTPAuthorizationCredentials, Depends(static_api_token)],
     credentials: Annotated[HTTPBasicCredentials, Depends(_user_basic_http_auth)],
-):
+) -> HTTPAuthorizationCredentials | None:
     if request.method not in UNSAFE_METHODS:
-        return
+        return None
 
     if api_token:
         return validate_api_token(api_token)
     if credentials:
-        return validate_basic_auth(credentials=credentials)
+        validate_basic_auth(credentials=credentials)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="API token is required or username and password is required.",

@@ -8,7 +8,7 @@ from core.config import settings
 class AbstractUserHelper(ABC):
 
     @abstractmethod
-    def get_user_password(self, username: str):
+    def get_user_password(self, username: str) -> str:
         pass
 
     @classmethod
@@ -19,7 +19,7 @@ class AbstractUserHelper(ABC):
         """
         return password1 == password2
 
-    def validate_user_password(self, username: str, password: str):
+    def validate_user_password(self, username: str, password: str) -> bool:
         password_db = self.get_user_password(username)
         if not password_db:
             return False
@@ -40,7 +40,7 @@ class RedisUserHelper(AbstractUserHelper):
             db=redis_db,
         )
 
-    def get_user_password(self, username) -> str | None:
+    def get_user_password(self, username: str) -> str:
         return self.redis.get(username)
 
 
