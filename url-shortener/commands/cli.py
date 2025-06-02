@@ -11,7 +11,7 @@ app.add_typer(tokens_app)
 
 
 @app.callback()
-def callback():
+def callback() -> None:
     """
     Тут описание работы этой утилиты CLI
     """

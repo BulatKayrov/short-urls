@@ -64,12 +64,19 @@ indent-width = 4
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["FAST"]
-ignore = []
+select = [
+    "FAST",     # FastAPI
+    "ANN",      # flake8-annotation
+    "I",        # isort
+    "F",        # PyFlakes
+]
+ignore = ["S101"]
 
 # то что ruff может сам починить
-fixable = ["ALL"]
 unfixable = []
+# Игнорировать определенный файл правилом
+[tool.ruff.lint.extend-per-file-ignores]
+"stuff.py" = ["T20"]
 
 
 

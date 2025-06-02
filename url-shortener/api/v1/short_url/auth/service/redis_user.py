@@ -32,7 +32,7 @@ class RedisUserHelper(AbstractUserHelper):
         host: str,
         port: int,
         redis_db: int,
-    ):
+    ) -> None:
         self.redis = Redis(
             host=host,
             port=port,

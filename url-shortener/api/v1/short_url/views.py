@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 
@@ -9,8 +9,8 @@ from api.v1.short_url.dependencies import (
 )
 from api.v1.short_url.schemas import (
     SCreateShortUrl,
-    SUpdatePathShortUrl,
     ShortUrl,
+    SUpdatePathShortUrl,
 )
 from tools import RESPONSES
 
@@ -26,18 +26,16 @@ router = APIRouter(
 )
 
 
-@router.get("/short-url", response_model=list[ShortUrl])
-def short_url() -> list[ShortUrl] | []:
+@router.get("/short-url")
+def short_url() -> list[ShortUrl]:
     return storage.get()
 
 
 @router.post(
     path="/short-url",
-    response_model=ShortUrl,
     status_code=status.HTTP_201_CREATED,
     summary="Create new short url",
     description="Create a new short url",
-    # dependencies=[Depends(user_basic_auth_required)],
 )
 def create_short_url(data: SCreateShortUrl) -> ShortUrl:
     return storage.create(data)
@@ -46,19 +44,21 @@ def create_short_url(data: SCreateShortUrl) -> ShortUrl:
 @router.delete(
     "/short-url/{slug}", status_code=status.HTTP_204_NO_CONTENT, responses={**RESPONSES}
 )
-def delete_short_url(url: Any = Depends(prefetch_short_urls)) -> None:
+def delete_short_url(url: Annotated[ShortUrl, Depends(prefetch_short_urls)]) -> None:
     storage.delete_by_slug(slug=url.slug)
 
 
-@router.put(path="/short-url/{slug}", response_model=ShortUrl)
+@router.put(path="/short-url/{slug}")
 def update_short_url(
-    short_in: SUpdatePathShortUrl, short: Any = Depends(prefetch_short_urls)
+    short_in: SUpdatePathShortUrl,
+    short: Annotated[ShortUrl, Depends(prefetch_short_urls)],
 ) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in)
 
 
-@router.patch(path="/short-url/{slug}", response_model=ShortUrl)
+@router.patch(path="/short-url/{slug}")
 def patch_short_url(
-    short_in: SUpdatePathShortUrl, short: Any = Depends(prefetch_short_urls)
+    short_in: SUpdatePathShortUrl,
+    short: Annotated[ShortUrl, Depends(prefetch_short_urls)],
 ) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in, partial=True)

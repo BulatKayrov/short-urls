@@ -41,7 +41,7 @@ class RedisTokenHelper(AbstractTokenHelper):
         port: int,
         redis_db: int,
         tokens_set_name: str,
-    ):
+    ) -> None:
         self.redis = Redis(
             host=host,
             port=port,

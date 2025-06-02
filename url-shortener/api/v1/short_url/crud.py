@@ -5,8 +5,8 @@ from redis import Redis
 
 from api.v1.short_url.schemas import (
     SCreateShortUrl,
-    SUpdatePathShortUrl,
     ShortUrl,
+    SUpdatePathShortUrl,
 )
 from core.config import settings
 
@@ -29,7 +29,7 @@ class ShortUrlsStorage:
             value=short_url.model_dump_json(),
         )
 
-    def get(self) -> list[ShortUrl] | []:
+    def get(self) -> list[ShortUrl]:
         result = redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
         return [ShortUrl.model_validate_json(item) for item in result] if result else []
 
