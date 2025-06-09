@@ -51,7 +51,8 @@ exclude = [
     "node_modules",
     "site-packages",
     "venv",
-    '.venv'
+    '.venv',
+    'testing'
 ]
 
 # откуда проверять
@@ -66,18 +67,15 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = [
-    "FAST",     # FastAPI
-    "ANN",      # flake8-annotation
-    "I",        # isort
-    "F",        # PyFlakes
+    "FAST", # FastAPI
+    "ANN", # flake8-annotation
+    "I", # isort
+    "F", # PyFlakes
 ]
-ignore = ["S101"]
+ignore = ["S101", "S311"]
 
 # то что ruff может сам починить
 unfixable = []
 # Игнорировать определенный файл правилом
 [tool.ruff.lint.extend-per-file-ignores]
 "stuff.py" = ["T20"]
-
-
-
