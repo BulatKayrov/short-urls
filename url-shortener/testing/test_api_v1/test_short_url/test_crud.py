@@ -1,4 +1,8 @@
 import unittest
+from os import getenv
+
+if getenv("TESTING") != "1":
+    raise EnvironmentError("Must be run in testing mode")
 
 
 def total(a: int, b: int) -> int:

@@ -20,5 +20,10 @@ class Settings(BaseSettings):
     REDIS_SHORT_URL: int = 0
     REDIS_SHORT_URL_HASH_NAME: str = "short_url"
 
+    # tests
+    TEST_REDIS_HOST: str = "localhost"
+    TEST_REDIS_PORT: int = 1234
+    TEST_REDIS_DB: int = 0
+
 
 settings = Settings()

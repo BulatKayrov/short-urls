@@ -25,7 +25,7 @@ class ShortUrlCreateTestCase(unittest.TestCase):
             "https://example.com",
             "http://www.abc.com",
             "http://ya.ru",
-            "rtmp://yoyo/ru",
+            "https://yoyo/ru",
         ]
 
         for url in urls:
