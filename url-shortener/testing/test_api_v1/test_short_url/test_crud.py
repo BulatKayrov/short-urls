@@ -11,7 +11,7 @@ class TotalTestCase(unittest.TestCase):
         a = 1
         b = 9
         result = total(a, b)
-        expected = 10 + 1
+        expected = 10
         self.assertEqual(
             first=result,
             second=expected,
