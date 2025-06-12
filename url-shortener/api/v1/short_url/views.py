@@ -7,11 +7,7 @@ from api.v1.short_url.dependencies import (
     prefetch_short_urls,
     storage,
 )
-from api.v1.short_url.schemas import (
-    SCreateShortUrl,
-    ShortUrl,
-    SUpdatePathShortUrl,
-)
+from api.v1.short_url.schemas import SCreateShortUrl, ShortUrl, SUpdatePartialShortUrl
 from tools import RESPONSES
 
 router = APIRouter(
@@ -50,7 +46,7 @@ def delete_short_url(url: Annotated[ShortUrl, Depends(prefetch_short_urls)]) -> 
 
 @router.put(path="/short-url/{slug}")
 def update_short_url(
-    short_in: SUpdatePathShortUrl,
+    short_in: SUpdatePartialShortUrl,
     short: Annotated[ShortUrl, Depends(prefetch_short_urls)],
 ) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in)
@@ -58,7 +54,7 @@ def update_short_url(
 
 @router.patch(path="/short-url/{slug}")
 def patch_short_url(
-    short_in: SUpdatePathShortUrl,
+    short_in: SUpdatePartialShortUrl,
     short: Annotated[ShortUrl, Depends(prefetch_short_urls)],
 ) -> ShortUrl:
     return storage.update_short(short_url=short, short_url_in=short_in, partial=True)

@@ -28,7 +28,7 @@ class SUpdateShortUrl(ShortUrlBase):
     description: str | None = "default"
 
 
-class SUpdatePathShortUrl(BaseModel):
+class SUpdatePartialShortUrl(BaseModel):
     target_url: AnyHttpUrl | None = None
     description: str | None = None
 

@@ -3,16 +3,12 @@ from logging import getLogger
 from fastapi import HTTPException
 from redis import Redis
 
-from api.v1.short_url.schemas import (
-    SCreateShortUrl,
-    ShortUrl,
-    SUpdatePathShortUrl,
-)
+from api.v1.short_url.schemas import SCreateShortUrl, ShortUrl, SUpdatePartialShortUrl
 from core.config import settings
 
 logger = getLogger(__name__)
 
-redis_helper = Redis(
+_redis_helper = Redis(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     db=settings.REDIS_SHORT_URL,
@@ -22,19 +18,22 @@ redis_helper = Redis(
 
 class ShortUrlsStorage:
 
+    def __init__(self, helper: Redis | None = None) -> None:
+        self.redis_helper = helper if helper else _redis_helper
+
     def save(self, short_url: ShortUrl) -> None:
-        redis_helper.hset(
+        self.redis_helper.hset(
             name=settings.REDIS_SHORT_URL_HASH_NAME,
             key=short_url.slug,
             value=short_url.model_dump_json(),
         )
 
     def get(self) -> list[ShortUrl]:
-        result = redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
+        result = self.redis_helper.hvals(name=settings.REDIS_SHORT_URL_HASH_NAME)
         return [ShortUrl.model_validate_json(item) for item in result] if result else []
 
     def get_by_slug(self, slug: str) -> str | None:
-        return redis_helper.hget(name=settings.REDIS_SHORT_URL_HASH_NAME, key=slug)
+        return self.redis_helper.hget(name=settings.REDIS_SHORT_URL_HASH_NAME, key=slug)
 
     def create(self, data: SCreateShortUrl | ShortUrl) -> ShortUrl:
         short_url = ShortUrl(**data.model_dump())
@@ -45,7 +44,7 @@ class ShortUrlsStorage:
         raise HTTPException(status_code=404, detail="Short url already exists")
 
     def delete_by_slug(self, slug: str) -> None:
-        redis_helper.hdel(settings.REDIS_SHORT_URL_HASH_NAME, slug)
+        self.redis_helper.hdel(settings.REDIS_SHORT_URL_HASH_NAME, slug)
 
     def delete_short_url(self, short_url: ShortUrl) -> None:
         self.delete_by_slug(slug=short_url.slug)
@@ -53,7 +52,7 @@ class ShortUrlsStorage:
     def update_short(
         self,
         short_url: ShortUrl,
-        short_url_in: SUpdatePathShortUrl,
+        short_url_in: SUpdatePartialShortUrl,
         partial: bool = False,
     ) -> ShortUrl:
         for name, value in short_url_in.model_dump(
