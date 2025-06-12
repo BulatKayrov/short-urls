@@ -5,3 +5,8 @@ services:
     container_name: redis-short-url
     ports:
       - "6666:6379"
+  test-redis:
+    image: redis:latest
+    container_name: test-redis
+    ports:
+      - "1234:6379"
