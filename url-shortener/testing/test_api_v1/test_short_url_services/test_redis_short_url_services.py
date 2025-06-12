@@ -1,4 +1,5 @@
 import uuid
+from typing import ClassVar
 from unittest import TestCase
 
 from redis import Redis
@@ -17,16 +18,15 @@ redis_test_short_url_storage = Redis(
 storage = ShortUrlsStorage(helper=redis_test_short_url_storage)
 
 
+def create_short_url(target_url="https://example.com") -> ShortUrl:
+    short_url_in = SCreateShortUrl(target_url=target_url, slug=uuid.uuid4().hex[:10])
+    return storage.create(data=short_url_in)
+
+
 class ShortUrlServiceTestCase(TestCase):
 
     def setUp(self):
-        self.short_url = self.create_short_url()
-
-    def create_short_url(self) -> ShortUrl:
-        short_url_in = SCreateShortUrl(
-            target_url="https://example.com", slug=uuid.uuid4().hex[:10]
-        )
-        return storage.create(data=short_url_in)
+        self.short_url = create_short_url()
 
     def tearDown(self):
         storage.delete_short_url(self.short_url)
@@ -51,3 +51,31 @@ class ShortUrlServiceTestCase(TestCase):
         )
 
         self.assertEqual(new_url, new_short_url.target_url.encoded_string())
+
+
+class ShortUrlMethodsGetTestCase(TestCase):
+    SHORT_URLS_COUNT = 3
+    short_urls: ClassVar[list[ShortUrl]] = []
+
+    @classmethod
+    def setUpClass(cls):
+        cls.short_urls = [create_short_url() for _ in range(cls.SHORT_URLS_COUNT)]
+
+    @classmethod
+    def tearDownClass(cls):
+        for short_url in cls.short_urls:
+            storage.delete_short_url(short_url)
+
+    def test_get_short_url_by_slug(self):
+        expected_slug = [_ for _ in self.short_urls][0].slug
+        get_value = storage.get_by_slug(expected_slug)
+        short_url = [_ for _ in self.short_urls if _.slug == expected_slug][0]
+        self.assertEqual(short_url, ShortUrl.model_validate_json(get_value))
+
+    def test_get_list(self):
+        values = [_.slug for _ in storage.get()]
+        expected_slug = [_.slug for _ in self.short_urls]
+
+        self.assertEqual(len(expected_slug), len(values))
+        self.assertIsNotNone(values)
+        self.assertIn(expected_slug[0], values)
