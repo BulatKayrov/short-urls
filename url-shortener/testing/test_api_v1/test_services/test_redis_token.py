@@ -1,11 +1,10 @@
 import unittest
-from os import getenv
 
 from api.v1.short_url.auth.service.redis_tokens import RedisTokenHelper
 from core.config import settings
 
-if getenv("TESTING") != "1":
-    raise EnvironmentError("Must be run in testing mode")
+# if getenv("TESTING") != "1":
+#     raise EnvironmentError("Must be run in testing mode")
 
 redis_test_service = RedisTokenHelper(
     host=settings.TEST_REDIS_HOST,
