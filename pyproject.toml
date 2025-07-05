@@ -16,13 +16,14 @@ dev = [
     "coverage>=7.9.0",
     "mypy>=1.15.0",
     "pre-commit>=4.2.0",
+    "pytest>=8.4.1",
 ]
 
 # mypy
 [tool.mypy]
 strict = true
 
-# ruff
+# ------ ruff --------
 [tool.ruff]
 
 # игнорирование
@@ -81,3 +82,4 @@ unfixable = []
 # Игнорировать определенный файл правилом
 [tool.ruff.lint.extend-per-file-ignores]
 "stuff.py" = ["T20"]
+# ------- ruff ------

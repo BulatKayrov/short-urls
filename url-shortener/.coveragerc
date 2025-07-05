@@ -1,0 +1,33 @@
+[run]
+branch = on
+command_line = -m unittest
+; какие файлы исключаем
+omit =
+    file.py
+
+
+[report]
+skip_empty = on
+; то что не хотим проверять на покрытие
+exclude_also =
+    ; Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    ; Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    ; Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    ; Don't complain about abstract methods, they aren't run:
+    @(abc\.)?abstractmethod
+
+    if getenv\(.TESTING.\) != .1.:
+
+ignore_errors = True
+
+[html]
+directory = coverage_html_report
